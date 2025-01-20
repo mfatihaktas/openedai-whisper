@@ -27,7 +27,7 @@ async def whisper(file, response_format: str, **kwargs):
 
     elif response_format == "json":
         return JSONResponse(content={ 'text': result['text'].strip() }, media_type="application/json", headers={"Content-Disposition": f"attachment; filename={filename_noext}.json"})
-    
+
     elif response_format == "verbose_json":
         chunks = result["chunks"]
 
@@ -52,7 +52,7 @@ async def whisper(file, response_format: str, **kwargs):
                     #"compression_ratio": 1.2363636493682861,
                     #"no_speech_prob": 0.00985979475080967
             } for i, chunk in enumerate(chunks) ]
-        
+
         return JSONResponse(content=response, media_type="application/json", headers={"Content-Disposition": f"attachment; filename={filename_noext}_verbose.json"})
 
     elif response_format == "srt":
@@ -65,12 +65,12 @@ async def whisper(file, response_format: str, **kwargs):
     elif response_format == "vtt":
             def vtt_time(t):
                 return "{:02d}:{:06.3f}".format(int(t//60), t%60)
-            
+
             return PlainTextResponse("\n".join(["WEBVTT\n"] + [ f"{vtt_time(chunk['timestamp'][0])} --> {vtt_time(chunk['timestamp'][1])}\n{chunk['text'].strip()}\n"
                 for chunk in result["chunks"] ]), media_type="text/vtt; charset=utf-8", headers={"Content-Disposition": f"attachment; filename={filename_noext}.vtt"})
 
 
-@app.post("/v1/audio/transcriptions")
+@app.post("/audio/transcriptions")
 async def transcriptions(
         file: UploadFile,
         model: str = Form(...),
@@ -101,7 +101,7 @@ async def transcriptions(
     return await whisper(file, response_format, **kwargs)
 
 
-@app.post("/v1/audio/translations")
+@app.post("/audio/translations")
 async def translations(
         file: UploadFile,
         model: str = Form(...),
